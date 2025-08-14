@@ -1,6 +1,8 @@
 ---
 title: "Monte Carlo in Julia: why and how"
-format: revealjs
+format: 
+  revealjs:
+    scrollable: true
 ---
 
 # What is the Julia language?
