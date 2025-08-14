@@ -1,0 +1,54 @@
+---
+title: "Monte Carlo in Julia: why and how"
+format: revealjs
+---
+
+# What is the Julia language?
+
+## TODO
+
+**TODO: use some material from e.g. Son's message**
+
+
+# Why use Julia for MCMC?
+
+## Julia compiles to both CPU and GPU
+
+- `KernelAbstraction.jl` is key: debug on CPU, run same code on GPU. 
+
+
+## `Julia` vs `JAX`
+
+- Both offer a path to high efficiency in a high-level syntax, targeting both GPU and CPU
+
+- Both require jumping through (distinct!) hoops
+  - `Julia`: avoiding allocation, ensure type stability
+  - `JAX`: pure functional style, static shapes, looping can be trickier
+
+- `JAX`'s development is heavily influenced by one use case (deep learning)
+
+**TODO: solicit some input here**
+
+
+# Pointers to useful libraries
+
+## MCMC Tools
+
+- `MCMCChains.jl`
+- `ArviZ.jl` 
+- `InferenceReport.jl`
+
+## Modelling languages
+
+**TODO: show syntax for a given model in all the languages**
+
+- `Turing.jl`
+- `Gen.jl` 
+- **TODO...**
+
+## Samplers 
+
+- `AdvancedHML.jl`
+- `Pigeons.jl`
+- **TODO: Son, can you flesh out that part a bit?** 
+
