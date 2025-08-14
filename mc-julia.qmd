@@ -48,7 +48,17 @@ format: revealjs
 
 ## Samplers 
 
-- `AdvancedHML.jl`
-- `Pigeons.jl`
-- **TODO: Son, can you flesh out that part a bit?** 
+-   `AdvancedHMC.jl`
+    -   HMC is a popular MCMC method that generate new samples by simulating trajectories following Hamiltonian dynamics
+    -   `AdvancedHMC` allows customization of various aspects of a HMC kernel including
+        -   Target Hamiltonian dynamics (potential energy, form of kinetic energy and associated metrics)
+        -   How trajectories are simulated (integrator, length of trajectories)
+        -   How samples are picked from trajectories (e.g. vanilla HMC, random HMC)
+        -   How momentum is refreshed (partial or full refreshment)
+    -   `AdvancedHMC` allows adaptation of various elements: integrator stepsize, mass matrix
+    -   Many AD packages can be used in `AdvancedHMC` kernel (compatibility depends on user-generated target log density!)    
+    -   Show an example of running a chain + examples of how kernels are built for different HMC methods
+    - Drawback: Phasepoint object can only store phase point and its gradients
 
+-   `Pigeons.jl`
+-   **TODO: Son, can you flesh out that part a bit?**
