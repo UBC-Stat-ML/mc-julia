@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+.vscode
+
+Manifest.toml
 
 /.quarto/
 mc-julia_files
