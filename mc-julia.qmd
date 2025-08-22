@@ -11,44 +11,42 @@ format:
 
 **TODO: use some material from e.g. Son's message**
 
-
 # Why use Julia for MCMC?
 
 ## Julia compiles to both CPU and GPU
 
-- `KernelAbstraction.jl` is key: debug on CPU, run same code on GPU. 
-
+-   `KernelAbstraction.jl` is key: debug on CPU, run same code on GPU.
 
 ## `Julia` vs `JAX`
 
-- Both offer a path to high efficiency in a high-level syntax, targeting both GPU and CPU
+-   Both offer a path to high efficiency in a high-level syntax, targeting both GPU and CPU
 
-- Both require jumping through (distinct!) hoops
-  - `Julia`: avoiding allocation, ensure type stability
-  - `JAX`: pure functional style, static shapes, looping can be trickier
+-   Both require jumping through (distinct!) hoops
 
-- `JAX`'s development is heavily influenced by one use case (deep learning)
+    -   `Julia`: avoiding allocation, ensure type stability
+    -   `JAX`: pure functional style, static shapes, looping can be trickier
+
+-   `JAX`'s development is heavily influenced by one use case (deep learning)
 
 **TODO: solicit some input here**
-
 
 # Pointers to useful libraries
 
 ## MCMC Tools
 
-- `MCMCChains.jl`
-- `ArviZ.jl` 
-- `InferenceReport.jl`
+-   `MCMCChains.jl`
+-   `ArviZ.jl`
+-   `InferenceReport.jl`
 
 ## Modelling languages
 
 **TODO: show syntax for a given model in all the languages**
 
-- `Turing.jl`
-- `Gen.jl` 
-- **TODO...**
+-   `Turing.jl`
+-   `Gen.jl`
+-   **TODO...**
 
-## Samplers 
+## Samplers
 
 -   `AdvancedHMC.jl`
     -   HMC is a popular MCMC method that generate new samples by simulating trajectories following Hamiltonian dynamics
@@ -58,9 +56,8 @@ format:
         -   How samples are picked from trajectories (e.g. vanilla HMC, random HMC)
         -   How momentum is refreshed (partial or full refreshment)
     -   `AdvancedHMC` allows adaptation of various elements: integrator stepsize, mass matrix
-    -   Many AD packages can be used in `AdvancedHMC` kernel (compatibility depends on user-generated target log density!)    
+    -   Many AD packages can be used in `AdvancedHMC` kernel (compatibility depends on user-generated target log density!)\
     -   Show an example of running a chain + examples of how kernels are built for different HMC methods
-    - Drawback: Phasepoint object can only store phase point and its gradients
-
+    -   Drawback: Phasepoint object can only store phase point and its gradients
 -   `Pigeons.jl`
 -   **TODO: Son, can you flesh out that part a bit?**

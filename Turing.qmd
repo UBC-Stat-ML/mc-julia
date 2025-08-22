@@ -3,10 +3,13 @@ title: "Turing.jl : A Tutorial"
 format: 
   revealjs:
     scrollable: true
-engine: julia
+engines: julia
 ---
 
 ```{julia}
+#| echo: false
+#| output: false
+
 using Pkg
 Pkg.instantiate()
 ```
@@ -15,7 +18,7 @@ Let's start by creating a model using `Turing`. To do this, we use the `@model` 
 As an example let's write the following Bayesian Logistic Regression model in `Turing`
 $$
 \begin{align}
-a_i &\sim N(0,\sigma), &i=1,\ldots,4 \\
+a_i &\sim N(0,\sigma^2), &i=1,\ldots,4 \\
 y_n &\sim \text{Bern}\left(\text{logistic}\left(\sum_{i=1}^4a_ix_{ni}\right)\right) & n=1,\ldots,N
 \end{align}
 $$
@@ -65,3 +68,107 @@ We can also plot out the chain trace plots and density estimations
 plot(chain)
 ```
 
+As an exercise, let's write the following Bayesian Gaussian mixture model as a `Turing` model
+$$
+\begin{align}
+\mu_k &\sim N(0,\sigma), & k=1,2\\
+w &\sim \text{Dirichlet}(1,1)\\
+z_i &\sim \text{Categorical}(w) & i=1\ldots,n\\
+x_i &\sim N([\mu_{z_i}\ \mu_{z_i}]^\top,I) & i=1\ldots,n
+\end{align}
+$$
+
+```{julia}
+#| eval: false
+
+@model function gaussian_mix( INSERT ARGUMENTS )
+    INSERT BODY
+end
+```
+
+# Querying probabilities from model or chain
+
+With `model` defined above, we can compute its log posterior density, log prior density and log likelihood using the following commands
+```{julia}
+# log posterior
+logjoint(model, (a = a,))
+
+# log prior
+logprior(model, (a = a,))
+
+# log likelihood
+loglikelihood(model, (a = a,))
+```
+
+We can also compute similar quantities from the `chain` output
+
+```{julia}
+# log likelihood from chain
+loglikelihood(model, chain)
+```
+
+# External samplers
+
+The `sample` function in Turing also support external samplers from packages such as `AdvancedHMC`, `AdvancedMH`. Here is an example with `AdvancedMH`
+
+```{julia}
+using AdvancedMH
+
+sampler = AdvancedMH.RWMH(4)
+
+chain_AHMC = sample(model, externalsampler(sampler), 10000, progress=false)
+```
+
+# Distributed sampling
+
+`Turing` can sample multiple chains in parallel via the `Distributed` package. Here is an example. Note that all quantities and packages will need to be redefined on all processes using the `@everywhere` macro.
+
+```{julia}
+# Load Distributed to add processes and the @everywhere macro.
+using Distributed
+
+
+# Add four processes to use for sampling.
+addprocs(4; exeflags="--project=$(Base.active_project())")
+
+# Initialize everything on all the processes.
+# Note: Make sure to do this after you've already loaded the packages,
+#       so each process does not have to precompile.
+#       Parallel sampling may fail silently if you do not do this.
+@everywhere begin
+    using Turing, DynamicPPL, LogDensityProblems
+    using LinearAlgebra, SplittableRandoms, StatsPlots
+    using Distributions, LogExpFunctions
+end
+
+# Define a model on all processes.
+@everywhere @model function bayes_logistic(x, y, N, σ)
+    a = Vector{Float64}(undef, 4)
+    for i in eachindex(a)
+        a[i] ~ Normal(0, σ) 
+    end
+
+    for n in 1:N
+        v = logistic(dot(a,x[n,:]))
+        y[n] ~ Bernoulli(v)
+    end
+end
+
+
+# Declare the model instance everywhere.
+@everywhere begin
+    # simulate dataset
+    rng = SplittableRandom(123)
+    N = 30
+    a = [10, 3.5, -0.7, -4.1]
+    x = randn(rng, 30, 4)
+    y = [rand(rng,Bernoulli(logistic(dot(a,x[n,:])))) for n in 1:N]
+
+    # create posterior distribution object
+    σ = 1.0
+    model = bayes_logistic(x, y, N, σ)
+end
+
+# Sample four chains using multiple processes, each with 1000 samples.
+chain_distributed = sample(model, NUTS(), MCMCDistributed(), 1000, 4)
+```

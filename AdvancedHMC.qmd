@@ -7,6 +7,9 @@ engine: julia
 ---
 
 ```{julia}
+#| echo: false
+#| output: false
+
 using Pkg
 Pkg.instantiate()
 ```
@@ -17,7 +20,7 @@ Let's start by creating a target distribution to sample from. For this tutorial,
 
 ```{julia}
 using AdvancedHMC, ReverseDiff
-using Turing, DynamicPPL, LogDensityProblems
+using DynamicPPL, LogDensityProblems
 using LinearAlgebra, SplittableRandoms, StatsPlots
 
 struct LogTargetDensity{Tμ,TΣ}
@@ -39,21 +42,6 @@ D = 10;
 μ = randn(rng,D);
 Σ = I
 ℓπ = LogTargetDensity(μ, Σ, D)
-```
-
-We can also create the target using `Turing` models
-
-```{julia}
-@model function my_turing_model(μ,Σ)
-  x ~ MvNormal(μ, Σ)
-end
-
-rng = SplittableRandom(123)
-D = 10;
-μ = randn(rng,D);
-Σ = I
-model_instance = my_turing_model(μ,Σ)
-ℓπ = LogDensityFunction(model_instance)
 ```
 
 Now let's see `AdvancedHMC` in action with the popular No-U-Turn sampler (NUTS)
@@ -90,7 +78,7 @@ To conveniently inspect the chain, we can use the following helper function to c
 
 ```{julia}
 function bundle_samples(
-    samples, stats;
+    samples, stats=nothing;
     param_names=missing,
     kwargs...,
 )
@@ -99,19 +87,28 @@ function bundle_samples(
     n = length(samples)
 
     # Turn all the transitions into a vector-of-vectors.
-    vals = copy(reduce(hcat, [vcat(samples[i], vcat(values(stats[i])...)) for i in 1:n])')
+    if isnothing(stats)
+        vals = copy(reduce(hcat, [samples[i] for i in 1:n])')
+    else
+        vals = copy(reduce(hcat, [vcat(samples[i], vcat(values(stats[i])...)) for i in 1:n])')
+    end
 
     # Check if we received any parameter names.
     if ismissing(param_names)
         param_names = [Symbol("Parameter $i") for i in 1:d]
     end
 
-    # Add the log density field to the parameter names.
-    internal_params = vcat(keys(stats[1])...)
-    push!(param_names, internal_params...)
+    if isnothing(stats)
+        # Bundle everything up and return a Chains struct.
+        return Chains(vals, param_names)
+    else
+        # Add internal parameter names.
+        internal_params = vcat(keys(stats[1])...)
+        push!(param_names, internal_params...)
 
-    # Bundle everything up and return a Chains struct.
-    return Chains(vals, param_names, (internals=internal_params,))
+        # Bundle everything up and return a Chains struct.
+        return Chains(vals, param_names, (internals=internal_params,))
+    end    
 end
 ```
 
@@ -119,7 +116,8 @@ Finally, we can view and plot the result
 
 ```{julia}
 chain = bundle_samples(samples, stats)
-
+```
+```{julia}
 plot(chain)
 ```
 
@@ -210,10 +208,39 @@ samples, stats = sample(hamiltonian, kernel, initial_θ, n_samples, adaptor, n_a
 chain = bundle_samples(samples, stats)
 ```
 
-## More customization
+# More customization
 
 For more flexible customization, we can also modify the functions in the package corresponding to the aspects of interest. Here are some examples of what functions to modify to accommodate certain aspects:
 
 -   For a new integrator, create its corresponding `struct` and modify the `step` function.
 
 -   For a new metric, create its corresponding `struct` and modify `rand_momentum`, `neg_energy`, `∂H∂r`.
+
+# More on `LogDensityProblems`
+
+As seen in the beginning, to specify a target in `LogDensityProblems`, we need the following
+
+-   a `struct` for the target
+
+-   the target log density function
+
+-   dimension of the target
+
+-   capabilities of the target, i.e. the degree of derivative to specify
+
+We can also create the target using `Turing` models
+
+```{julia}
+using Turing
+
+@model function my_turing_model(μ,Σ)
+  x ~ MvNormal(μ, Σ)
+end
+
+rng = SplittableRandom(123)
+D = 10;
+μ = randn(rng,D);
+Σ = I
+model_instance = my_turing_model(μ,Σ)
+ℓπ = LogDensityFunction(model_instance)
+```

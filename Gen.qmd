@@ -6,6 +6,14 @@ format:
 engine: julia
 ---
 
+```{julia}
+#| echo: false
+#| output: false
+
+using Pkg
+Pkg.instantiate()
+```
+
 For `Gen`, the model creation process is similar to `Turing` except for a few differences
 
 -   The `@gen` macro is used to define a model instead of the `@model` macro.
@@ -14,9 +22,10 @@ For `Gen`, the model creation process is similar to `Turing` except for a few di
 
 -   The arguments of the model only include fixed quantities that does not have a distribution statement.
 
-Let's look at the Bayesian Logistic Regression model from the `Turing` tutorial $$
+Let's look at the Bayesian Logistic Regression model from the `Turing` tutorial 
+$$
 \begin{align}
-a_i &\sim N(0,\sigma), &i=1,\ldots,4 \\
+a_i &\sim N(0,\sigma^2), &i=1,\ldots,4 \\
 y_n &\sim \text{Bern}\left(\text{logistic}\left(\sum_{i=1}^4a_ix_{ni}\right)\right) & n=1,\ldots,N
 \end{align}
 $$
