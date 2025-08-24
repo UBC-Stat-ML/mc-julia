@@ -1,8 +1,5 @@
 ---
 title: "Gen.jl : A Tutorial"
-format: 
-  revealjs:
-    scrollable: true
 engine: julia
 ---
 
@@ -22,8 +19,7 @@ For `Gen`, the model creation process is similar to `Turing` except for a few di
 
 -   The arguments of the model only include fixed quantities that does not have a distribution statement.
 
-Let's look at the Bayesian Logistic Regression model from the `Turing` tutorial 
-$$
+Let's look at the Bayesian Logistic Regression model from the `Turing` tutorial $$
 \begin{align}
 a_i &\sim N(0,\sigma^2), &i=1,\ldots,4 \\
 y_n &\sim \text{Bern}\left(\text{logistic}\left(\sum_{i=1}^4a_ix_{ni}\right)\right) & n=1,\ldots,N
@@ -34,7 +30,7 @@ Note that in the code below, $x,\sigma$ and $N$ are in the argument because the 
 
 ```{julia}
 using Gen, MCMCChains
-using DynamicPPL, Distributions, LogExpFunctions
+using Distributions, LogExpFunctions
 using LinearAlgebra, SplittableRandoms, StatsPlots
 
 # model definition
@@ -47,11 +43,11 @@ using LinearAlgebra, SplittableRandoms, StatsPlots
 end
 
 # simulate dataset
-rng = SplittableRandom(123)
-N = 30
-a = [10, 3.5, -0.7, -4.1]
-x = randn(rng, 30, 4)
-y = [rand(rng,Bernoulli(logistic(dot(a,x[n,:])))) for n in 1:N]
+rng = SplittableRandom(123);
+N = 30;
+a = [10, 3.5, -0.7, -4.1];
+x = randn(rng, 30, 4);
+y = [rand(rng,Bernoulli(logistic(dot(a,x[n,:])))) for n in 1:N];
 ```
 
 Next, let's use a simple coordinate-wise random walk Metropolis-Hastings sampler to sample from our model. There are two important procedures in the function below

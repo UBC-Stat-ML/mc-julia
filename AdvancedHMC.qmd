@@ -1,8 +1,5 @@
 ---
 title: "AdvancedHMC.jl : A Tutorial"
-format: 
-  revealjs:
-    scrollable: true
 engine: julia
 ---
 
@@ -20,8 +17,9 @@ Let's start by creating a target distribution to sample from. For this tutorial,
 
 ```{julia}
 using AdvancedHMC, ReverseDiff
-using DynamicPPL, LogDensityProblems
+using LogDensityProblems, MCMCChains
 using LinearAlgebra, SplittableRandoms, StatsPlots
+using Distributions
 
 struct LogTargetDensity{Tμ,TΣ}
     μ::Tμ
@@ -32,7 +30,7 @@ end
 LogDensityProblems.logdensity(p::LogTargetDensity, θ) = logpdf(MvNormal(p.μ,p.Σ),θ)
 LogDensityProblems.dimension(p::LogTargetDensity) = p.dim
 
-function LogDensityProblems.capabilities(::Type{LogTargetDensity})
+function LogDensityProblems.capabilities(::LogTargetDensity)
     return LogDensityProblems.LogDensityOrder{0}()
 end
 
@@ -117,6 +115,7 @@ Finally, we can view and plot the result
 ```{julia}
 chain = bundle_samples(samples, stats)
 ```
+
 ```{julia}
 plot(chain)
 ```
@@ -179,7 +178,7 @@ There are of course more options to choose from in the `AdvancedHMC`. For more i
 As an exercise, let's define a different HMC sampler and run it on our target
 
 ```{julia}
-#| echo: false
+#| eval: false
 
 # specify metric
 metric = 
