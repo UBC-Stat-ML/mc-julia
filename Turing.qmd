@@ -1,8 +1,5 @@
 ---
 title: "Turing.jl : A Tutorial"
-format: 
-  revealjs:
-    scrollable: true
 engines: julia
 ---
 
@@ -23,7 +20,7 @@ y_n &\sim \text{Bern}\left(\text{logistic}\left(\sum_{i=1}^4a_ix_{ni}\right)\rig
 \end{align}
 $$
 ```{julia}
-using Turing, DynamicPPL, LogDensityProblems
+using Turing
 using LinearAlgebra, SplittableRandoms, StatsPlots
 using Distributions, LogExpFunctions
 @model function bayes_logistic(x, y, N, σ)
@@ -91,13 +88,13 @@ end
 With `model` defined above, we can compute its log posterior density, log prior density and log likelihood using the following commands
 ```{julia}
 # log posterior
-logjoint(model, (a = a,))
+@show logjoint(model, (a = a,));
 
 # log prior
-logprior(model, (a = a,))
+@show logprior(model, (a = a,));
 
 # log likelihood
-loglikelihood(model, (a = a,))
+@show loglikelihood(model, (a = a,));
 ```
 
 We can also compute similar quantities from the `chain` output
@@ -124,6 +121,8 @@ chain_AHMC = sample(model, externalsampler(sampler), 10000, progress=false)
 `Turing` can sample multiple chains in parallel via the `Distributed` package. Here is an example. Note that all quantities and packages will need to be redefined on all processes using the `@everywhere` macro.
 
 ```{julia}
+#| eval: false
+
 # Load Distributed to add processes and the @everywhere macro.
 using Distributed
 
@@ -136,7 +135,7 @@ addprocs(4; exeflags="--project=$(Base.active_project())")
 #       so each process does not have to precompile.
 #       Parallel sampling may fail silently if you do not do this.
 @everywhere begin
-    using Turing, DynamicPPL, LogDensityProblems
+    using Turing
     using LinearAlgebra, SplittableRandoms, StatsPlots
     using Distributions, LogExpFunctions
 end

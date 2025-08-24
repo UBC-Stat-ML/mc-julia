@@ -9,3 +9,9 @@ Manifest.toml
 /.quarto/
 mc-julia_files
 mc-julia.html
+AdvancedHMC_files
+AdvancedHMC.html
+Turing_files
+Turing.html
+Gen_files
+Gen.html
