@@ -1,0 +1,146 @@
+---
+title: "`InferenceTargets`"
+subtitle: "Interesting and difficult Monte Carlo targets"
+format: 
+  revealjs:
+    scrollable: true
+engine: knitr
+---
+
+## Motivation
+
+- Useful to benchmark on many problems. 
+  - Include difficult ones. 
+  - Variety is important. 
+- We do not want the field to overfit on a few overstudied targets. 
+
+
+## `InferenceTargets` 
+
+- Two audiences:
+  - Researchers benchmarking inference algorithms. 
+  - Users of these algorithms who have encountered a challenging problem that they would like to share.
+- Documentation: [link](https://julia-tempering.github.io/InferenceTargets/dev/).
+
+
+## Locating a target
+
+- Locate the *target collection* paged called `PigeonsExamples` from [the documentation](https://julia-tempering.github.io/InferenceTargets/dev/). 
+- **Exercise:** In the page you just found, locate the `targetId` for an Ising model.
+
+<br><br><br><br><br><br><br><br>
+
+::: {.callout-note}
+## Hint
+
+Search 'ising' in the page.
+:::
+
+
+## Creating an empty project 
+
+**Exercise:** 
+
+- Create an empty folder.
+- Start Julia, `cd` to the folder and **activate it**. 
+    - "activate" means it will use a config file specific this folder for dependencies versions.
+- Create a script, say `main.jl` inside your directory.
+    - Put all the Julia code in there. 
+    - Use `include("main.jl")` to run your code. 
+
+
+<br><br><br><br><br><br>
+
+::: {.callout-note}
+## Hint
+
+First create a directory:
+```{bash}
+#| echo: true
+mkdir -p MyInferenceTargetExercise
+```
+
+Go in that directory, and start julia:
+```{.bash}
+#| echo: true
+cd MyInferenceTargetExercise
+julia
+```
+
+Activate your project:
+```{.julia}
+using Pkg
+Pkg.activate(".")
+```
+
+
+```{julia}
+# We are not showing this bit as it is slightly different than what the user's script will look like
+cd("MyInferenceTargetExercise")
+using Pkg
+Pkg.activate(".")
+```
+:::
+
+
+## Setting up the targets collection into your project
+
+Use the following code to setup the `PigeonsExamples` collection and all its 
+dependencies:
+
+```{julia}
+#| echo: true
+
+Pkg.add(url = "https://github.com/Julia-Tempering/InferenceTargets", 
+        rev = "6e5d8ae462dac48e4c2b4d5ae559892b36863bf0")
+
+using InferenceTargets
+
+Pkg.add(InferenceTargets.registry[:PigeonsExamples]); using PigeonsExamples
+```
+
+
+## Grab the target 
+
+- **Exercise:** grab the target with id `ising` in the `PigeonsExamples` collection.
+- Use the InferenceTargets [API documentation page](https://julia-tempering.github.io/InferenceTargets/dev/reference).
+
+<br><br><br><br><br><br><br>
+
+::: {.callout-note}
+## Hint
+
+Use `load_target` as follows:
+
+```{julia}
+#| echo: true
+ising_target = load_target(PigeonsExamples, :ising)
+```
+:::
+
+
+## Run `Pigeons` on the Ising target
+
+- **Exercise:** use `pigeons(target = ...)` to run Non-Reversible Parallel Tempering. 
+- You will have to first add Pigeons to your project's dependencies and call `using`. 
+
+<br><br><br><br><br><br><br>
+
+::: {.callout-note}
+## Hint
+
+Install, load and call pigeons as follows:
+
+```{julia}
+#| echo: true
+Pkg.add("Pigeons")
+using Pigeons
+pigeons(target = ising_target)
+```
+:::
+
+
+## Advanced topic: diving into Pigeons' target API
+
+
+## Advanced topic: creating and publishing a target collection

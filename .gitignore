@@ -9,3 +9,8 @@ Manifest.toml
 /.quarto/
 mc-julia_files
 mc-julia.html
+test_files
+InferenceTargets_files
+MyInferenceTargetExercise
+InferenceTargets.rmarkdown
+InferenceTargets.html
