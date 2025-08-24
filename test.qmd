@@ -1,9 +1,15 @@
 ---
 title: "test"
-format: html
+format: 
+  revealjs:
+    scrollable: true
 engine: knitr
 ---
 
+## Test slide
+
 ```{julia}
+#| echo: true
 1+1
 ```
+
