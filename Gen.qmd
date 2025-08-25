@@ -11,7 +11,7 @@ using Pkg
 Pkg.instantiate()
 ```
 
-For `Gen`, the model creation process is similar to `Turing` except for a few differences
+`Gen` is another PPL package that came out around the same time as `Turing`. For `Gen`, the model creation process is similar to `Turing` except for a few differences
 
 -   The `@gen` macro is used to define a model instead of the `@model` macro.
 

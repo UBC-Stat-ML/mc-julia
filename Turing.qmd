@@ -10,12 +10,16 @@ engines: julia
 using Pkg
 Pkg.instantiate()
 ```
+`Turing` is a PPL package that
+-   uses syntax similar to model mathematical specification
+
+-   enables various sampling methods as well as diagnostics through its package ecosystem
 
 Let's start by creating a model using `Turing`. To do this, we use the `@model` macro. In this macro,
 
 -   Specification of distribution statement uses the `~` notation, e.g.
 
-    -   $a_i &\sim N(0,\sigma^2)$ $x\sim N(0,1)$ is `x~Normal(0,1)`
+    -   $x\sim N(0,1)$ is `x~Normal(0,1)`
 
     -   $v_i \sim \text{Cauchy}(2,1)$ is `v[i]~Cauchy(2,1)`
 
