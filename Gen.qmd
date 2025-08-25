@@ -105,7 +105,7 @@ end;
 Now we can sample from our model
 
 ```{julia}
-samples = mh_sampler(bayes_logistic_gen, 10000, x, N, 1.0)
+samples = mh_sampler(bayes_logistic_gen, 10000, x, N, 1.0);
 ```
 
 and, with a helper function to turn the output to a `Chains` object, visualize the result.
@@ -148,3 +148,5 @@ end
 chain = bundle_samples(samples; param_names = ["a$i" for i in 1:4])
 plot(chain)
 ```
+
+For more functionalities and uses, see [Gen docs](https://www.gen.dev/docs/stable/)

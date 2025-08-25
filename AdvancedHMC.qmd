@@ -39,12 +39,14 @@ rng = SplittableRandom(123)
 D = 10;
 μ = randn(rng,D);
 Σ = I
-ℓπ = LogTargetDensity(μ, Σ, D)
+ℓπ = LogTargetDensity(μ, Σ, D);
 ```
 
 Now let's see `AdvancedHMC` in action with the popular No-U-Turn sampler (NUTS)
 
 ```{julia}
+#| output: false
+
 # specify metric
 metric = DiagEuclideanMetric(D)
 
@@ -69,7 +71,7 @@ n_samples, n_adapts = 2_000, 1_000
 initial_θ = randn(rng,D)
 
 # begin sampling
-samples, stats = sample(hamiltonian, kernel, initial_θ, n_samples, adaptor, n_adapts)
+samples, stats = sample(hamiltonian, kernel, initial_θ, n_samples, adaptor, n_adapts);
 ```
 
 To conveniently inspect the chain, we can use the following helper function to convert it in to a `Chains` object
@@ -175,25 +177,30 @@ In our example above, we used
 
 There are of course more options to choose from in the `AdvancedHMC`. For more information, see [AdvancedHMC docs](https://turinglang.org/AdvancedHMC.jl/dev/api/).
 
-As an exercise, let's define a different HMC sampler and run it on our target
+As an exercise, let's define a vanilla HMC sampler with 20 leapfrog steps and run it on our target
 
+::: {.callout-caution collapse="true"}
+## Click for answer
 ```{julia}
-#| eval: false
+#| output: false
 
 # specify metric
-metric = 
+metric = DiagEuclideanMetric(D)
 
 # specify hamiltonian
-hamiltonian = 
+hamiltonian = Hamiltonian(metric, ℓπ, ReverseDiff)
 
 # specify integrator
-integrator = 
+ϵ = 0.1
+integrator = Leapfrog(ϵ)
 
 # specify kernel
-kernel = 
+n_leapfrog = 20
+kernel = HMCKernel(Trajectory{EndPointTS}(integrator, FixedNSteps(n_leapfrog)))
 
 # specify adaptor
-adaptor = 
+δ = 0.8
+adaptor = StanHMCAdaptor(MassMatrixAdaptor(metric), StepSizeAdaptor(δ, integrator))
 
 # initial chain values
 rng = SplittableRandom(123)
@@ -202,10 +209,17 @@ initial_θ = randn(rng,D)
 
 # begin sampling
 samples, stats = sample(hamiltonian, kernel, initial_θ, n_samples, adaptor, n_adapts)
-
-# chain output
-chain = bundle_samples(samples, stats)
 ```
+
+Now let's look at and visualize the output
+```{julia}
+# chain output
+chain_HMC = bundle_samples(samples, stats)
+```
+```{julia}
+plot(chain_HMC)
+```
+:::
 
 # More customization
 
@@ -241,5 +255,5 @@ D = 10;
 μ = randn(rng,D);
 Σ = I
 model_instance = my_turing_model(μ,Σ)
-ℓπ = LogDensityFunction(model_instance)
+ℓπ = LogDensityFunction(model_instance);
 ```

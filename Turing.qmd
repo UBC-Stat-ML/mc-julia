@@ -11,14 +11,23 @@ using Pkg
 Pkg.instantiate()
 ```
 
-Let's start by creating a model using `Turing`. To do this, we use the `@model` macro. In this macro, we specify distribution statement using the `~` notation. For example, if variable `x` in our model has $N(0,1)$, we can simply write it as `x~Normal(0,1)`. Aside from this the rest of the macro syntax follows regular julia code including transformations, assignments, indexing, etc.
-As an example let's write the following Bayesian Logistic Regression model in `Turing`
-$$
+Let's start by creating a model using `Turing`. To do this, we use the `@model` macro. In this macro,
+
+-   Specification of distribution statement uses the `~` notation, e.g.
+
+    -   $a_i &\sim N(0,\sigma^2)$ $x\sim N(0,1)$ is `x~Normal(0,1)`
+
+    -   $v_i \sim \text{Cauchy}(2,1)$ is `v[i]~Cauchy(2,1)`
+
+-   Other relations follows regular julia code (transformations, assignments, indexing, etc)
+
+As an example let's write the following Bayesian Logistic Regression model in `Turing` $$
 \begin{align}
 a_i &\sim N(0,\sigma^2), &i=1,\ldots,4 \\
 y_n &\sim \text{Bern}\left(\text{logistic}\left(\sum_{i=1}^4a_ix_{ni}\right)\right) & n=1,\ldots,N
 \end{align}
 $$
+
 ```{julia}
 using Turing
 using LinearAlgebra, SplittableRandoms, StatsPlots
@@ -33,7 +42,7 @@ using Distributions, LogExpFunctions
         v = logistic(dot(a,x[n,:]))
         y[n] ~ Bernoulli(v)
     end
-end
+end;
 ```
 
 With this model, we can simulate a dataset and create a corresponding posterior distribution object
@@ -48,7 +57,7 @@ y = [rand(rng,Bernoulli(logistic(dot(a,x[n,:])))) for n in 1:N]
 
 # create posterior distribution object
 σ = 1.0
-model = bayes_logistic(x, y, N, σ)
+model = bayes_logistic(x, y, N, σ);
 ```
 
 Now we can sample from `model` using the `sample` function. Let's using the No-U-Turn sampler (NUTS) as our MCMC sampler here
@@ -65,8 +74,7 @@ We can also plot out the chain trace plots and density estimations
 plot(chain)
 ```
 
-As an exercise, let's write the following Bayesian Gaussian mixture model as a `Turing` model
-$$
+As an exercise, let's write the following Bayesian Gaussian mixture model as a `Turing` model $$
 \begin{align}
 \mu_k &\sim N(0,\sigma), & k=1,2\\
 w &\sim \text{Dirichlet}(1,1)\\
@@ -75,17 +83,44 @@ x_i &\sim N([\mu_{z_i}\ \mu_{z_i}]^\top,I) & i=1\ldots,n
 \end{align}
 $$
 
-```{julia}
-#| eval: false
+::: {.callout-caution collapse="true"}
+## Click for answer
 
-@model function gaussian_mix( INSERT ARGUMENTS )
-    INSERT BODY
-end
+```{julia}
+
+using FillArrays
+
+@model function gaussian_mix(x)
+    # Draw the parameters for each of the K=2 clusters from a standard normal distribution.
+    K = 2
+    μ ~ MvNormal(Zeros(K), I)
+
+    # Draw the weights for the K clusters from a Dirichlet distribution with parameters αₖ = 1.
+    w ~ Dirichlet(K, 1.0)
+
+    # Construct categorical distribution of assignments.
+    distribution_assignments = Categorical(w)
+
+    # Construct multivariate normal distributions of each cluster.
+    n, d = size(x) # sample size and dimension of data
+    distribution_clusters = [MvNormal(Fill(μₖ, d), I) for μₖ in μ]
+
+    # Draw assignments for each datum and generate it from the multivariate normal distribution.
+    k = Vector{Int}(undef, n)
+    for i in 1:n
+        z[i] ~ distribution_assignments
+        x[:, i] ~ distribution_clusters[z[i]]
+    end
+
+    return k
+end;
 ```
+:::
 
 # Querying probabilities from model or chain
 
 With `model` defined above, we can compute its log posterior density, log prior density and log likelihood using the following commands
+
 ```{julia}
 # log posterior
 @show logjoint(model, (a = a,));
@@ -101,7 +136,7 @@ We can also compute similar quantities from the `chain` output
 
 ```{julia}
 # log likelihood from chain
-loglikelihood(model, chain)
+loglikelihood(model, chain);
 ```
 
 # External samplers
@@ -171,3 +206,7 @@ end
 # Sample four chains using multiple processes, each with 1000 samples.
 chain_distributed = sample(model, NUTS(), MCMCDistributed(), 1000, 4)
 ```
+
+# More functionalities
+
+For more functionalities and uses, see [Turing docs](https://turinglang.org/docs/getting-started/)
