@@ -5,31 +5,107 @@ format:
     scrollable: true
 ---
 
-# What is the Julia language?
 
-## TODO
 
-**TODO: use some material from e.g. Son's message**
+## Intro
+
+**Topic:** Julia MCMC development
+
+**Audience:** 
+
+- Pigeons' new grad students cohort
+- ... and happy to take on board any other interested people!
+
+
+# Logistics
+
+## This is just a beginning!
+
+- We will continue bi-weekly starting the week of September 8. 
+- Hybrid meetings.
+- Homework in today's first break: if in Pigeons cohort (or participating in the sessions), fill this survey for the day/time:
+  https://www.when2meet.com/?31871515-p2cW1
+- Note for my students: this will also be the new time for my reading group (every other weeks while we run this program).
+
+## Getting these slides
+
+- This repo: [https://github.com/UBC-Stat-ML/mc-julia](https://github.com/UBC-Stat-ML/mc-julia)
+
 
 # Why use Julia for MCMC?
 
-## Julia compiles to both CPU and GPU
+## Easy to get started
+
+- The "base Julia" documentation is good: [read it](https://docs.julialang.org/en/v1/manual/documentation/)
+
+- There is only one package management system.
+  - `Pkg`, part of the base Julia documentation. 
+  - It is reasonable. 
+  - Homework: learn it.
+
+- Advice to beginner: start by writing short, plain functions. 
+
+
+## Scalability
+
+- Just-in-time compilation. 
+    - Great environment to design probabilistic programming languages. 
+
+- There is often a short path from prototype to scalable code. 
+  - True story: 1h meeting between a first year PhD and a couple of experience Julia coders
+    - 100x speed-up between beginning and end of meeting. 
+    - The student was at the keyboard the whole time!
+
+
+## The same Julia code compiles to both CPU and GPU
 
 -   `KernelAbstraction.jl` is key: debug on CPU, run same code on GPU.
+-   I will host a session on KernelAbstractions soon as part of this series.  
+
+
+## Why not Python?
+
+- You already have python on your CV (and so do all the applicants).
+
+- Python is often 100x slower than Julia. 
+    - For MCMC, that kind of gap matters.
+   
+- Better question: "why not JAX?"
+
 
 ## `Julia` vs `JAX`
 
--   Both offer a path to high efficiency in a high-level syntax, targeting both GPU and CPU
+-   Both offer a path to high efficiency in a high-level syntax, targeting both GPU and CPU.
 
--   Both require jumping through (distinct!) hoops
+-   Both require jumping through (distinct!) hoops to get to high efficiency:
 
-    -   `Julia`: avoiding allocation, ensure type stability
-    -   `JAX`: pure functional style, static shapes, looping can be trickier
+    -   `Julia`: avoiding allocation, ensure type stability.
+    -   `JAX`: pure functional style, static shapes, looping can be trickier.
 
--   `JAX`'s development is heavily influenced by one use case (deep learning)
+-   `JAX`'s development heavily influenced by another use case: deep learning. 
 
-**TODO: solicit some input here**
+    -   Some of the most interesting use cases of MCMC go beyond static shaped arrays.  
+    
+    
 
+# Julia for MCMC
+
+## Rest of today:
+
+- Probabilistic Julia: a fresh approach to probabilistic programming.
+
+- Useful Julia MCMC libraries.
+    - Turing.jl
+    - AdvancedHMC.jl
+    - Gen.jl
+    
+## Survey
+
+If in Pigeons cohort (or want to participate in the sessions), fill this survey for the day/time:
+  https://www.when2meet.com/?31871515-p2cW1
+
+  
+<!--
 # Pointers to useful libraries
 
 ## MCMC Tools
@@ -61,3 +137,5 @@ format:
     -   Drawback: Phasepoint object can only store phase point and its gradients
 -   `Pigeons.jl`
 -   **TODO: Son, can you flesh out that part a bit?**
+
+-->

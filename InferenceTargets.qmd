@@ -7,72 +7,89 @@ format:
 engine: knitr
 ---
 
+# MCMC Benchmarking: going beyond anectodes
+
+## 
+
+![](fig/pima.jpg)
+
+
 ## Motivation
 
-- Useful to benchmark on many problems. 
-  - Include difficult ones. 
-  - Variety is important. 
-- We do not want the field to overfit on a few overstudied targets. 
+-   Importance to benchmark on many problems.
+    -   **Including many difficult ones** that are actual **bottlenecks for some users.**
+    -   Variety is also important.
+-   We do not want the field to overfit on a few overstudied targets (which are often too easy) 
 
 
-## `InferenceTargets` 
+## `InferenceTargets`
 
-- Two audiences:
-  - Researchers benchmarking inference algorithms. 
-  - Users of these algorithms who have encountered a challenging problem that they would like to share.
-- Documentation: [link](https://julia-tempering.github.io/InferenceTargets/dev/).
+-   Two audiences:
+    -   Researchers benchmarking inference algorithms. (part 1)
+    -   Users of these algorithms who have encountered a challenging problem that they would like to share. (part 2)
+-   Documentation: [link](https://julia-tempering.github.io/InferenceTargets/dev/).
 
+
+# `InferenceTargets` to do benchmarking
+(Audience 1)
 
 ## Locating a target
 
-- Locate the *target collection* paged called `PigeonsExamples` from [the documentation](https://julia-tempering.github.io/InferenceTargets/dev/). 
-- **Exercise:** In the page you just found, locate the `targetId` for an Ising model.
+-   Locate the *target collection* paged called `PigeonsExamples` from [the documentation](https://julia-tempering.github.io/InferenceTargets/dev/).
+-   **Exercise:** In the page you just found, locate the `targetId` for an Ising model.
 
-<br><br><br><br><br><br><br><br>
+::: callout-note
+## Hint
 
-::: {.callout-note}
+When you see **exercise** in a page, scroll down for hint/solution.
+:::
+
+<br><br><br><br><br><br><br>
+
+::: callout-note
 ## Hint
 
 Search 'ising' in the page.
 :::
 
 
-## Creating an empty project 
+## Creating an empty project
 
-**Exercise:** 
+**Exercise:**
 
-- Create an empty folder.
-- Start Julia, `cd` to the folder and **activate it**. 
-    - "activate" means it will use a config file specific this folder for dependencies versions.
-- Create a script, say `main.jl` inside your directory.
-    - Put all the Julia code in there. 
-    - Use `include("main.jl")` to run your code. 
-
+-   Create an empty folder.
+-   Start Julia, `cd` to the folder and **activate it**.
+    -   "activate" means it will use a config file specific this folder for dependencies' versions.
+-   Create a script, say `main.jl` inside your directory.
+    -   Put all the Julia code in there.
+    -   Use `include("main.jl")` to run your code.
 
 <br><br><br><br><br><br>
 
-::: {.callout-note}
+::: callout-note
 ## Hint
 
 First create a directory:
+
 ```{bash}
 #| echo: true
 mkdir -p MyInferenceTargetExercise
 ```
 
 Go in that directory, and start julia:
-```{.bash}
+
+``` bash
 #| echo: true
 cd MyInferenceTargetExercise
 julia
 ```
 
 Activate your project:
-```{.julia}
+
+``` julia
 using Pkg
 Pkg.activate(".")
 ```
-
 
 ```{julia}
 # We are not showing this bit as it is slightly different than what the user's script will look like
@@ -85,8 +102,7 @@ Pkg.activate(".")
 
 ## Setting up the targets collection into your project
 
-Use the following code to setup the `PigeonsExamples` collection and all its 
-dependencies:
+Use the following code to setup the `PigeonsExamples` collection and all its dependencies:
 
 ```{julia}
 #| echo: true
@@ -99,15 +115,14 @@ using InferenceTargets
 Pkg.add(InferenceTargets.registry[:PigeonsExamples]); using PigeonsExamples
 ```
 
+## Grab the target
 
-## Grab the target 
-
-- **Exercise:** grab the target with id `ising` in the `PigeonsExamples` collection.
-- Use the InferenceTargets [API documentation page](https://julia-tempering.github.io/InferenceTargets/dev/reference).
+-   **Exercise:** grab the target with id `ising` in the `PigeonsExamples` collection.
+-   Use the InferenceTargets [API documentation page](https://julia-tempering.github.io/InferenceTargets/dev/reference).
 
 <br><br><br><br><br><br><br>
 
-::: {.callout-note}
+::: callout-note
 ## Hint
 
 Use `load_target` as follows:
@@ -118,15 +133,14 @@ ising_target = load_target(PigeonsExamples, :ising)
 ```
 :::
 
-
 ## Run `Pigeons` on the Ising target
 
-- **Exercise:** use `pigeons(target = ...)` to run Non-Reversible Parallel Tempering. 
-- You will have to first add Pigeons to your project's dependencies and call `using`. 
+-   **Exercise:** use `pigeons(target = ...)` to run Non-Reversible Parallel Tempering.
+-   You will have to first add Pigeons to your project's dependencies and call `using`.
 
 <br><br><br><br><br><br><br>
 
-::: {.callout-note}
+::: callout-note
 ## Hint
 
 Install, load and call pigeons as follows:
@@ -140,7 +154,119 @@ pigeons(target = ising_target)
 :::
 
 
-## Advanced topic: diving into Pigeons' target API
+# Sharing a hard problem with `InferenceTargets`
+(Audience 2)
+
+## Setup
+
+- Create a Julia package:
+
+```{.julia}
+#| echo: true
+using Pkg
+Pkg.generate("MyTargetsRepo")
+```
 
 
-## Advanced topic: creating and publishing a target collection
+- Add your target's code (in `src`) and dependencies (with `Pkg` as earlier).
+  - No need to add `InferenceTargets` as a dependency.
+
+
+## Make your target(s) discoverable 
+
+```{.julia}
+#| echo: true
+provide_target(::Val{:my_target_id}) = some_code_that_builds_your_target()
+```
+
+
+::: callout-note
+## Note
+
+If you have a very large number of targets in your collection, 
+see [documentation page](https://julia-tempering.github.io/InferenceTargets/dev/#Large-collections-provided-ids-style) 
+for an alternative approach. 
+:::
+
+## Finishing up
+
+- Push to github (your package does not have to be registered)
+- Make a PR request adding a line to [this file](https://github.com/Julia-Tempering/InferenceTargets/blob/main/src/targets_registry.jl).
+- Your page will be automatically added to the [targets registry](https://julia-tempering.github.io/InferenceTargets/dev/) when your PR is merged.
+
+
+
+# Additional topics
+
+## Diving into Pigeons' target API
+
+- In the first part we acquired `ising_target`
+- How does Pigeons interact with the target?
+
+**Key reference for this part:** Pigeons' target [*informal interface*](https://pigeons.run/dev/interfaces/#target)
+
+
+## Getting an initial point 
+
+
+```{julia}
+#| echo: true
+
+using Random 
+r = MersenneTwister(1);
+point = Pigeons.initialization(ising_target, r, 1)
+```
+
+
+## Evaluating the logdensity of the target at that point
+
+```{julia}
+#| echo: true
+
+ising_target(point)
+```
+
+
+## Obtaining a reference distribution
+
+A reference is a tractable distribution on the same space but for 
+which we can sample iid.
+
+```{julia}
+#| echo: true
+
+ref = Pigeons.default_reference(ising_target)
+```
+
+
+## Other useful functions
+
+- `Pigeons.create_path(...)`: Create a path linking the given target to the refence.
+- `Pigeons.default_explorer(...)`: An default MCMC algorithm for the given target. 
+
+
+## Converting Pigeons targets to LogDensityProblemsAD
+
+In the special case of targets defined on $\mathbb{R}^n$, it is possible to 
+convert to the `LogDensityProblemsAD` interface using the following:
+
+```{.julia}
+using Pigeons, ADTypes, LogDensityProblems, LogDensityProblemsAD, ForwardDiff
+
+# Log density interface 
+function log_density_problem_ad(target, backend = AutoForwardDiff()) 
+    pt = single_chain_pigeons(target; n_rounds = 0, explorer = AutoMALA()) 
+    log_potential = Pigeons.find_log_potential(pt.replicas[1], pt.shared.tempering, pt.shared)
+    interpolated = ADgradient(backend, log_potential, pt.replicas[1])
+    return interpolated.target_ad
+end
+
+single_chain_pigeons(target; args...) = pigeons(; target, n_chains = 1, reference = target, args...)
+```
+
+
+## TODO
+
+- try exoplanet
+- modify these slides to use it
+- add README for references
