@@ -23,6 +23,8 @@ Let's start by creating a model using `Turing`. To do this, we use the `@model` 
 
     -   $v_i \sim \text{Cauchy}(2,1)$ is `v[i]~Cauchy(2,1)`
 
+-   Distribution syntax in `Turing` follows `Distribution`. See [Distribution docs](https://juliastats.org/Distributions.jl/stable/) for a list of common distribution families.
+
 -   Other relations follows regular julia code (transformations, assignments, indexing, etc)
 
 As an example let's write the following Bayesian Logistic Regression model in `Turing` $$
